@@ -1,13 +1,18 @@
 package com.elmenus.task.drones.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Set;
 
+@Builder
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "medication")
 public class Medication implements Serializable {
@@ -25,12 +30,12 @@ public class Medication implements Serializable {
     @Column(name = "weight", nullable = false)
     private Integer weight;
 
-    @Column(name = "code", nullable = false)
+    @Column(name = "code", nullable = false, length = 50)
     private String code;
 
     @Column(name = "image", nullable = false)
     private String image;
 
-    @ManyToMany(mappedBy = "medications")
-    private Set<Drone> drones = new HashSet<>();
+    @OneToMany(mappedBy = "medication", cascade = CascadeType.ALL)
+    private Set<DroneMedication> droneMedications;
 }

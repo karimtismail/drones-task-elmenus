@@ -16,14 +16,21 @@ CREATE TABLE IF NOT EXISTS medication
     code   VARCHAR(50)  NOT NULL,
     image  VARCHAR(255) NOT NULL
 );
-
 CREATE TABLE IF NOT EXISTS drone_medication
 (
+    id            INT PRIMARY KEY AUTO_INCREMENT,
     drone_id      INT,
     medication_id INT,
-    PRIMARY KEY (drone_id, medication_id),
-    FOREIGN KEY (drone_id) REFERENCES drone (id),
-    FOREIGN KEY (medication_id) REFERENCES medication (id),
-    CONSTRAINT fk_drone FOREIGN KEY (drone_id) REFERENCES drone (id),
-    CONSTRAINT fk_medication FOREIGN KEY (medication_id) REFERENCES medication (id)
+    quantity      INT,
+    FOREIGN KEY (drone_id) REFERENCES Drone (id),
+    FOREIGN KEY (medication_id) REFERENCES Medication (id)
+);
+
+CREATE TABLE IF NOT EXISTS audit_log
+(
+    id                  INT AUTO_INCREMENT PRIMARY KEY,
+    drone_id            INT,
+    drone_serial_number VARCHAR(100),
+    event_description   VARCHAR(255),
+    event_timestamp     TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

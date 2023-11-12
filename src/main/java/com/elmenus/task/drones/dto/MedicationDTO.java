@@ -1,38 +1,45 @@
 package com.elmenus.task.drones.dto;
 
 
-import com.elmenus.task.drones.entity.Drone;
+import com.elmenus.task.drones.entity.DroneMedication;
 import jakarta.persistence.Column;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Set;
 
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class MedicationDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Integer id;
 
-    @NotBlank(message = "Name is mandatory")
+    @NotBlank(message = "Name is required")
+    @NotEmpty(message = "Name cannot be empty")
+    @Pattern(regexp = "^[a-zA-Z0-9_-]*$", message = "Name must contain only letters, numbers, '-', and '_'")
     @Size(max = 255, message = "Name cannot exceed 255 characters")
     private String name;
 
     @Column(name = "weight")
-    @Min(value = 1, message = "Weight must be greater than 0")
+    @PositiveOrZero(message = "Weight must be a positive or zero value")
     private Integer weight;
 
-    @NotBlank(message = "Code is mandatory")
+    @NotEmpty(message = "Code cannot be empty")
+    @Pattern(regexp = "^[A-Z0-9_]*$", message = "Code must contain only upper case letters, numbers, and '_'")
     @Size(max = 50, message = "Code cannot exceed 50 characters")
     private String code;
 
     @Column(name = "image")
-    @NotBlank(message = "Image URL is mandatory")
+    @NotEmpty(message = "Image cannot be empty")
     private String image;
 
-    private Set<Drone> drones = new HashSet<>();
+    private Set<DroneMedication> droneMedications;
+
 }

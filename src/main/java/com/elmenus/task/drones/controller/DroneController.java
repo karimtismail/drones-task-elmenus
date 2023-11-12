@@ -11,10 +11,5 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/drone")
 public class DroneController {
 
-    private final DroneService droneService;
 
-    @Autowired
-    public DroneController(DroneService droneService) {
-        this.droneService = droneService;
-    }
 }

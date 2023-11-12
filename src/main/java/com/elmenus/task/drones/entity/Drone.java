@@ -3,13 +3,18 @@ package com.elmenus.task.drones.entity;
 import com.elmenus.task.drones.enums.DroneModel;
 import com.elmenus.task.drones.enums.DroneState;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Set;
 
+@Builder
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "drone")
 public class Drone implements Serializable {
@@ -21,7 +26,7 @@ public class Drone implements Serializable {
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    @Column(name = "serial_number", nullable = false)
+    @Column(name = "serial_number", nullable = false, length = 100)
     private String serialNumber;
 
     @Enumerated(EnumType.STRING)
@@ -38,12 +43,6 @@ public class Drone implements Serializable {
     @Column(name = "state", nullable = false)
     private DroneState state;
 
-    @ManyToMany
-    @JoinTable(
-            name = "drone_medication",
-            joinColumns = @JoinColumn(name = "drone_id"),
-            inverseJoinColumns = @JoinColumn(name = "medication_id")
-    )
-    private Set<Medication> medications = new HashSet<>();
-
+    @OneToMany(mappedBy = "drone", cascade = CascadeType.ALL)
+    private Set<DroneMedication> droneMedications;
 }
