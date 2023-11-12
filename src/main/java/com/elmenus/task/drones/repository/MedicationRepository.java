@@ -8,9 +8,18 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+/**
+ * Repository interface for managing {@link Medication} entities.
+ */
 @Repository
 public interface MedicationRepository extends JpaRepository<Medication, Integer> {
 
+    /**
+     * Retrieves a list of loaded medications for a drone with the specified serial number.
+     *
+     * @param serialNumber The serial number of the drone.
+     * @return A list of medications loaded on the drone with the specified serial number.
+     */
     @Query("SELECT m FROM Medication m " +
             "JOIN m.droneMedications dm " +
             "WHERE dm.drone.serialNumber = :serialNumber")

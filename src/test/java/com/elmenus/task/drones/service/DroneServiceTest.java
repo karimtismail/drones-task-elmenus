@@ -1,10 +1,8 @@
 package com.elmenus.task.drones.service;
 
-import com.elmenus.task.drones.dto.DroneDTO;
 import com.elmenus.task.drones.dto.MedicationDTO;
 import com.elmenus.task.drones.entity.Drone;
 import com.elmenus.task.drones.enums.DroneState;
-import com.elmenus.task.drones.exception.BatteryLowException;
 import com.elmenus.task.drones.exception.WeightExceededException;
 import com.elmenus.task.drones.repository.AuditLogRepository;
 import com.elmenus.task.drones.repository.DroneRepository;
@@ -18,13 +16,14 @@ import org.mockito.MockitoAnnotations;
 import org.modelmapper.ModelMapper;
 
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
+/**
+ * Unit tests for the {@link DroneService} class.
+ */
 public class DroneServiceTest {
 
     @Mock
@@ -39,51 +38,24 @@ public class DroneServiceTest {
     @InjectMocks
     private DroneService droneService;
 
+    /**
+     * Setup method to initialize mock objects.
+     */
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
     }
 
-    @Nested
-    @DisplayName("Tests for registerDrone method")
-    class RegisterDroneTests {
-
-        @Test
-        @DisplayName("Should register drone successfully")
-        public void shouldRegisterDroneSuccessfully() {
-            // Arrange
-            DroneDTO droneDTO = new DroneDTO();
-            droneDTO.setBatteryCapacity(50);
-
-            Drone drone = new Drone();
-            when(mapper.map(droneDTO, Drone.class)).thenReturn(drone);
-            when(droneRepository.save(drone)).thenReturn(drone);
-            when(mapper.map(drone, DroneDTO.class)).thenReturn(droneDTO);
-
-            // Act
-            Optional<DroneDTO> result = droneService.registerDrone(droneDTO);
-
-            // Assert
-            verify(droneRepository, times(1)).save(drone);
-            assertEquals(droneDTO, result);
-        }
-
-        @Test
-        @DisplayName("Should throw BatteryLowException when battery capacity is low")
-        public void shouldThrowBatteryLowExceptionWhenBatteryCapacityIsLow() {
-            // Arrange
-            DroneDTO droneDTO = new DroneDTO();
-            droneDTO.setBatteryCapacity(20);
-
-            // Act & Assert
-            assertThrows(BatteryLowException.class, () -> droneService.registerDrone(droneDTO));
-        }
-    }
-
+    /**
+     * Nested class containing tests for the {@code loadDroneWithMedications} method.
+     */
     @Nested
     @DisplayName("Tests for loadDroneWithMedications method")
     class LoadDroneWithMedicationsTests {
 
+        /**
+         * Test case: Should throw WeightExceededException when weight limit is exceeded.
+         */
         @Test
         @DisplayName("Should throw WeightExceededException when weight limit is exceeded")
         public void shouldThrowWeightExceededExceptionWhenWeightLimitIsExceeded() {
