@@ -1,15 +1,14 @@
 package com.elmenus.task.drones.dto;
 
 
-import com.elmenus.task.drones.entity.DroneMedication;
 import com.elmenus.task.drones.enums.DroneModel;
-import com.elmenus.task.drones.enums.DroneState;
 import jakarta.validation.constraints.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 
 @Builder
 @AllArgsConstructor
@@ -17,8 +16,6 @@ import java.util.Set;
 @Data
 public class DroneDTO implements Serializable {
     private static final long serialVersionUID = 1L;
-
-    private Integer id;
 
     @Size(max = 100, message = "Serial number must be at most 100 characters")
     @NotBlank(message = "Serial number is required")
@@ -38,10 +35,5 @@ public class DroneDTO implements Serializable {
     @PositiveOrZero(message = "Battery capacity must be a positive or zero value")
     @Max(value = 100, message = "Battery capacity cannot exceed 100 percent")
     private Integer batteryCapacity;
-
-    @NotNull(message = "Drone state is mandatory field")
-    private DroneState state;
-
-    private Set<DroneMedication> droneMedications;
 
 }

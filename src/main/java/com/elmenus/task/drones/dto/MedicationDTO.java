@@ -1,7 +1,6 @@
 package com.elmenus.task.drones.dto;
 
 
-import com.elmenus.task.drones.entity.DroneMedication;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -10,7 +9,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.Set;
 
 @Builder
 @AllArgsConstructor
@@ -18,8 +16,6 @@ import java.util.Set;
 @Data
 public class MedicationDTO implements Serializable {
     private static final long serialVersionUID = 1L;
-
-    private Integer id;
 
     @NotBlank(message = "Name is required")
     @NotEmpty(message = "Name cannot be empty")
@@ -39,7 +35,4 @@ public class MedicationDTO implements Serializable {
     @Column(name = "image")
     @NotEmpty(message = "Image cannot be empty")
     private String image;
-
-    private Set<DroneMedication> droneMedications;
-
 }

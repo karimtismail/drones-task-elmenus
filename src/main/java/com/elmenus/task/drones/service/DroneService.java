@@ -40,15 +40,15 @@ public class DroneService {
 
     @Transactional
     public Optional<DroneDTO> registerDrone(DroneDTO droneDTO) {
-        validateDroneDTO(droneDTO);
-        droneDTO.setState(DroneState.IDLE);
         Drone drone = mapper.map(droneDTO, Drone.class);
+        validateDroneDTO(drone);
+        drone.setState(DroneState.IDLE);
         Drone savedDrone = droneRepository.save(drone);
         return Optional.of(mapper.map(savedDrone, DroneDTO.class));
     }
 
-    private static void validateDroneDTO(DroneDTO droneDTO) {
-        if (droneDTO.getBatteryCapacity() < MIN_BATTERY_CAPACITY_FOR_LOADING && droneDTO.getState() == DroneState.LOADING) {
+    private static void validateDroneDTO(Drone drone) {
+        if (drone.getBatteryCapacity() < MIN_BATTERY_CAPACITY_FOR_LOADING && drone.getState() == DroneState.LOADING) {
             throw new BatteryLowException("Drone battery is low during loading state");
         }
     }
@@ -93,7 +93,7 @@ public class DroneService {
     }
 
     public List<DroneDTO> getAvailableDronesForLoading() {
-        List<Drone> drones = droneRepository.findByState(DroneState.IDLE);
+        List<Drone> drones = droneRepository.findByState(DroneState.LOADING);
         return drones.stream()
                 .map(drone -> mapper.map(drone, DroneDTO.class))
                 .collect(Collectors.toList());
@@ -110,8 +110,15 @@ public class DroneService {
         drones.forEach(drone -> {
             logEvent(drone, "Low Battery");
             droneRepository.save(drone);
-            changeDroneState(drone.getSerialNumber());
+            changeDroneState(drone.getSerialNumber(), DroneState.IDLE);
         });
+    }
+
+    public Optional<DroneDTO> changeDroneState(String serialNumber, DroneState newState) {
+        Drone drone = droneRepository.findBySerialNumber(serialNumber);
+        drone.setState(newState);
+        logEvent(drone, "Changed state to " + newState);
+        return Optional.of(mapper.map(droneRepository.save(drone), DroneDTO.class));
     }
 
     private void logEvent(Drone drone, String event) {
@@ -124,12 +131,7 @@ public class DroneService {
         System.out.println("Drone ID: " + drone.getId() + ", Event: " + event);
     }
 
-    public Optional<DroneDTO> changeDroneState(String serialNumber) {
-        Drone drone = droneRepository.findBySerialNumber(serialNumber);
-        if (drone.getBatteryCapacity() < MIN_BATTERY_CAPACITY_FOR_LOADING) {
-            drone.setState(DroneState.IDLE);
-            logEvent(drone, "Changed state to IDLE due to low battery");
-        }
-        return Optional.of(mapper.map(droneRepository.save(drone), DroneDTO.class));
+    public List<AuditLog> getAuditLogEvents() {
+        return auditLogRepository.findAll();
     }
 }

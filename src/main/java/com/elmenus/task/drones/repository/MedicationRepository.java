@@ -12,9 +12,7 @@ import java.util.List;
 public interface MedicationRepository extends JpaRepository<Medication, Integer> {
 
     @Query("SELECT m FROM Medication m " +
-            "JOIN DroneMedication dm " +
-            "WHERE dm.drone.serialNumber = :serialNumber " +
-            "AND dm.drone.state = 'LOADED'")
+            "JOIN m.droneMedications dm " +
+            "WHERE dm.drone.serialNumber = :serialNumber")
     List<Medication> findLoadedMedicationsForDrone(@Param("serialNumber") String serialNumber);
 }
-

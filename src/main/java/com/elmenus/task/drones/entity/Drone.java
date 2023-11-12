@@ -2,6 +2,7 @@ package com.elmenus.task.drones.entity;
 
 import com.elmenus.task.drones.enums.DroneModel;
 import com.elmenus.task.drones.enums.DroneState;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.Set;
 
 @Builder
@@ -44,5 +46,20 @@ public class Drone implements Serializable {
     private DroneState state;
 
     @OneToMany(mappedBy = "drone", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private Set<DroneMedication> droneMedications;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Drone drone = (Drone) o;
+        return Objects.equals(id, drone.id) && Objects.equals(serialNumber, drone.serialNumber) && model == drone.model && Objects.equals(weightLimit, drone.weightLimit) && Objects.equals(batteryCapacity, drone.batteryCapacity) && state == drone.state && Objects.equals(droneMedications, drone.droneMedications);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, serialNumber, model, weightLimit, batteryCapacity, state);
+    }
+
 }

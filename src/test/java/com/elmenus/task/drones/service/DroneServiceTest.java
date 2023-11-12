@@ -54,7 +54,6 @@ public class DroneServiceTest {
             // Arrange
             DroneDTO droneDTO = new DroneDTO();
             droneDTO.setBatteryCapacity(50);
-            droneDTO.setState(DroneState.LOADING);
 
             Drone drone = new Drone();
             when(mapper.map(droneDTO, Drone.class)).thenReturn(drone);
@@ -75,7 +74,6 @@ public class DroneServiceTest {
             // Arrange
             DroneDTO droneDTO = new DroneDTO();
             droneDTO.setBatteryCapacity(20);
-            droneDTO.setState(DroneState.LOADING);
 
             // Act & Assert
             assertThrows(BatteryLowException.class, () -> droneService.registerDrone(droneDTO));
