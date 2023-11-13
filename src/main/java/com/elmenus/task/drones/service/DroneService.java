@@ -7,9 +7,7 @@ import com.elmenus.task.drones.entity.Drone;
 import com.elmenus.task.drones.entity.DroneMedication;
 import com.elmenus.task.drones.entity.Medication;
 import com.elmenus.task.drones.enums.DroneState;
-import com.elmenus.task.drones.exception.BatteryLowException;
-import com.elmenus.task.drones.exception.DroneStateException;
-import com.elmenus.task.drones.exception.WeightExceededException;
+import com.elmenus.task.drones.exception.*;
 import com.elmenus.task.drones.repository.AuditLogRepository;
 import com.elmenus.task.drones.repository.DroneRepository;
 import org.modelmapper.ModelMapper;
@@ -33,6 +31,10 @@ public class DroneService {
      * Constant for the minimum battery capacity required for loading medications.
      */
     public static final int MIN_BATTERY_CAPACITY_FOR_LOADING = 25;
+    /**
+     * Constant for the maximum battery capacity required for loading medications.
+     */
+    public static final int MAX_BATTERY_CAPACITY_FOR_LOADING = 100;
 
     /**
      * Constant for the maximum weight of medications that can be loaded onto a drone.
@@ -72,13 +74,18 @@ public class DroneService {
     }
 
     /**
-     * Validates a drone DTO for registration.
+     * Validates the battery capacity of a drone based on its state.
      *
-     * @param drone The drone entity to be validated.
+     * @param drone The {@link Drone} entity to be validated.
+     * @throws BatteryLowException  If the battery capacity is below the minimum allowed during loading state.
+     * @throws BatteryHighException If the battery capacity exceeds the maximum allowed.
      */
     private static void validateDroneDTO(Drone drone) {
         if (drone.getBatteryCapacity() < MIN_BATTERY_CAPACITY_FOR_LOADING && drone.getState() == DroneState.LOADING) {
             throw new BatteryLowException("Drone battery is low during loading state");
+        }
+        if (drone.getBatteryCapacity() > MAX_BATTERY_CAPACITY_FOR_LOADING) {
+            throw new BatteryHighException("Cannot change battery capacity because it exceeds 100 percent");
         }
     }
 
@@ -87,7 +94,7 @@ public class DroneService {
      *
      * @param serialNumber The serial number of the drone to be loaded.
      * @param medications  The set of medications to be loaded onto the drone.
-     * @return An optional containing the loaded drone as a DTO.
+     * @return An optional {@link DroneDTO} containing the loaded drone as a DTO.
      */
     @Transactional
     public Optional<DroneDTO> loadDroneWithMedications(String serialNumber, Set<MedicationDTO> medications) {
@@ -103,10 +110,13 @@ public class DroneService {
     }
 
     /**
-     * Validates a drone for loading medications.
+     * Validates a drone's suitability for loading medications.
      *
-     * @param drone  The drone entity to be validated.
-     * @param weight The total weight of medications to be loaded.
+     * @param drone  The {@link Drone} entity to be validated.
+     * @param weight The weight of the medication to be loaded.
+     * @throws BatteryLowException     If the battery capacity is below the minimum required for loading medications.
+     * @throws WeightExceededException If the weight of the medication exceeds the maximum allowed.
+     * @throws DroneStateException     If the drone is not in a valid state for loading medications.
      */
     private void validateDroneForLoading(Drone drone, int weight) {
         if (drone.getBatteryCapacity() < MIN_BATTERY_CAPACITY_FOR_LOADING) {
@@ -149,7 +159,7 @@ public class DroneService {
     /**
      * Retrieves a list of available drones for loading.
      *
-     * @return A list of DroneDTOs representing available drones for loading.
+     * @return A list of {@link DroneDTO} representing available drones for loading.
      */
     public List<DroneDTO> getAvailableDronesForLoading() {
         List<Drone> drones = droneRepository.findByState(DroneState.LOADING);
@@ -187,7 +197,7 @@ public class DroneService {
      *
      * @param serialNumber The serial number of the drone.
      * @param newState     The new state to set for the drone.
-     * @return An optional containing the updated drone as a DTO.
+     * @return An optional {@link DroneDTO} containing the updated drone as a DTO.
      */
     public Optional<DroneDTO> changeDroneState(String serialNumber, DroneState newState) {
         Drone drone = droneRepository.findBySerialNumber(serialNumber);
@@ -218,9 +228,29 @@ public class DroneService {
     /**
      * Retrieves a list of audit log events.
      *
-     * @return A list of AuditLog entities representing audit log events.
+     * @return A list of {@link AuditLog} entities representing audit log events.
      */
     public List<AuditLog> getAuditLogEvents() {
         return auditLogRepository.findAll();
+    }
+
+    /**
+     * Changes the battery capacity of a drone identified by its serial number.
+     *
+     * @param serialNumber       The serial number of the drone.
+     * @param newBatteryCapacity The new battery capacity to set for the drone.
+     * @return A {@link DroneDTO} representing the updated state of the drone.
+     * @throws BatteryHighException If the new battery capacity would exceed 100 percent.
+     */
+    public Optional<DroneDTO> changeBatteryCapacity(String serialNumber, int newBatteryCapacity) {
+        Drone drone = droneRepository.findBySerialNumber(serialNumber);
+        if (drone.getBatteryCapacity() > MAX_BATTERY_CAPACITY_FOR_LOADING) {
+            throw new BatteryHighException("Cannot change battery capacity because it exceeds 100 percent");
+        }
+        if (drone.getBatteryCapacity() == newBatteryCapacity) {
+            throw new BatteryEqualException("You added the same battery capacity");
+        }
+        drone.setBatteryCapacity(newBatteryCapacity);
+        return Optional.of(mapper.map(droneRepository.save(drone), DroneDTO.class));
     }
 }

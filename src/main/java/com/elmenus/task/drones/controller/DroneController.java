@@ -132,4 +132,25 @@ public class DroneController {
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
+    /**
+     * Endpoint for changing the battery capacity of a drone.
+     *
+     * @param serialNumber       The serial number of the drone.
+     * @param newBatteryCapacity The new battery capacity to set for the drone.
+     * @return ResponseEntity with the changed drone DTO and HTTP status.
+     */
+    @PostMapping("/{serialNumber}/change-battery-capacity/{newBatteryCapacity}")
+    public ResponseEntity<DroneDTO> changeBatteryCapacity(
+            @PathVariable String serialNumber,
+            @PathVariable int newBatteryCapacity
+    ) {
+        if (newBatteryCapacity < 0 || newBatteryCapacity > 100) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        Optional<DroneDTO> changedDrone = droneService.changeBatteryCapacity(serialNumber, newBatteryCapacity);
+        return changedDrone
+                .map(drone -> new ResponseEntity<>(drone, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
 }
