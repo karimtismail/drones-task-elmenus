@@ -191,6 +191,9 @@ public class DroneService {
      */
     public Optional<DroneDTO> changeDroneState(String serialNumber, DroneState newState) {
         Drone drone = droneRepository.findBySerialNumber(serialNumber);
+        if (drone.getBatteryCapacity() < 25) {
+            throw new BatteryLowException("Cannot change state drone when battery capacity is low");
+        }
         drone.setState(newState);
         logEvent(drone, "Changed state to " + newState);
         return Optional.of(mapper.map(droneRepository.save(drone), DroneDTO.class));
