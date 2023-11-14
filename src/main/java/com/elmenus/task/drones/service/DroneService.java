@@ -77,10 +77,14 @@ public class DroneService {
      * Validates the battery capacity of a drone based on its state.
      *
      * @param drone The {@link Drone} entity to be validated.
-     * @throws BatteryLowException  If the battery capacity is below the minimum allowed during loading state.
-     * @throws BatteryHighException If the battery capacity exceeds the maximum allowed.
+     * @throws DroneNotFoundException If the drone not found using serial number.
+     * @throws BatteryLowException    If the battery capacity is below the minimum allowed during loading state.
+     * @throws BatteryHighException   If the battery capacity exceeds the maximum allowed.
      */
     private static void validateDroneDTO(Drone drone) {
+        if (drone == null) {
+            throw new DroneNotFoundException("Drone not found with serial number: " + drone.getSerialNumber());
+        }
         if (drone.getBatteryCapacity() < MIN_BATTERY_CAPACITY_FOR_LOADING && drone.getState() == DroneState.LOADING) {
             throw new BatteryLowException("Drone battery is low during loading state");
         }
@@ -99,6 +103,9 @@ public class DroneService {
     @Transactional
     public Optional<DroneDTO> loadDroneWithMedications(String serialNumber, Set<MedicationDTO> medications) {
         Drone drone = droneRepository.findBySerialNumber(serialNumber);
+        if (drone == null) {
+            throw new DroneNotFoundException("Drone not found with serial number: " + serialNumber);
+        }
         int weight = calculateTotalWeight(medications);
         validateDroneForLoading(drone, weight);
         Set<Medication> medicationEntities = medications.stream()
@@ -201,6 +208,9 @@ public class DroneService {
      */
     public Optional<DroneDTO> changeDroneState(String serialNumber, DroneState newState) {
         Drone drone = droneRepository.findBySerialNumber(serialNumber);
+        if (drone == null) {
+            throw new DroneNotFoundException("Drone not found with serial number: " + serialNumber);
+        }
         if (drone.getBatteryCapacity() < 25) {
             throw new BatteryLowException("Cannot change state drone when battery capacity is low");
         }
@@ -234,21 +244,16 @@ public class DroneService {
         return auditLogRepository.findAll();
     }
 
-    /**
-     * Changes the battery capacity of a drone identified by its serial number.
-     *
-     * @param serialNumber       The serial number of the drone.
-     * @param newBatteryCapacity The new battery capacity to set for the drone.
-     * @return A {@link DroneDTO} representing the updated state of the drone.
-     * @throws BatteryHighException If the new battery capacity would exceed 100 percent.
-     */
     public Optional<DroneDTO> changeBatteryCapacity(String serialNumber, int newBatteryCapacity) {
         Drone drone = droneRepository.findBySerialNumber(serialNumber);
-        if (drone.getBatteryCapacity() > MAX_BATTERY_CAPACITY_FOR_LOADING) {
+        if (drone == null) {
+            throw new DroneNotFoundException("Drone not found with serial number: " + serialNumber);
+        }
+        if (newBatteryCapacity > MAX_BATTERY_CAPACITY_FOR_LOADING) {
             throw new BatteryHighException("Cannot change battery capacity because it exceeds 100 percent");
         }
         if (drone.getBatteryCapacity() == newBatteryCapacity) {
-            throw new BatteryEqualException("You added the same battery capacity");
+            throw new BatteryEqualException("The new battery capacity is the same as the current battery capacity");
         }
         drone.setBatteryCapacity(newBatteryCapacity);
         return Optional.of(mapper.map(droneRepository.save(drone), DroneDTO.class));
