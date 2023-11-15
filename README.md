@@ -13,8 +13,9 @@
   - [Prerequisites](#prerequisites)
   - [Building and Running](#building-and-running)
 - [Development](#development)
-  - [Database](#database)
-  - [Swagger API Documentation](#periodic-task)
+  - [Database Configuration](#database-configuration)
+  - [Swagger API Documentation](#swagger-api-documentation)
+
 
 ---
 
