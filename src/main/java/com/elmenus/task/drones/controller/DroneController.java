@@ -4,10 +4,9 @@ import com.elmenus.task.drones.dto.DroneDTO;
 import com.elmenus.task.drones.dto.MedicationDTO;
 import com.elmenus.task.drones.entity.AuditLog;
 import com.elmenus.task.drones.enums.DroneState;
-import com.elmenus.task.drones.exception.BatteryLowException;
-import com.elmenus.task.drones.exception.DroneStateException;
-import com.elmenus.task.drones.exception.WeightExceededException;
+import com.elmenus.task.drones.exception.*;
 import com.elmenus.task.drones.service.DroneService;
+import com.elmenus.task.drones.utility.ApiResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -40,14 +39,21 @@ public class DroneController {
     }
 
     /**
-     * Exception handler for BatteryLowException, WeightExceededException, and DroneStateException.
+     * Exception handler for BatteryLowException, BatteryHighException, BatteryEqualException, WeightExceededException, DroneStateException, and DroneNotFoundException.
      *
      * @param e The exception to be handled.
      * @return ResponseEntity with an error message and HTTP status.
      */
-    @ExceptionHandler({BatteryLowException.class, WeightExceededException.class, DroneStateException.class})
-    public ResponseEntity<String> handleCustomExceptions(RuntimeException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    @ExceptionHandler({
+            BatteryLowException.class,
+            BatteryHighException.class,
+            BatteryEqualException.class,
+            WeightExceededException.class,
+            DroneStateException.class,
+            DroneNotFoundException.class})
+    public ResponseEntity<ApiResponse<Void>> handleCustomExceptions(RuntimeException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(e.getMessage(), HttpStatus.BAD_REQUEST));
     }
 
     /**
@@ -57,11 +63,11 @@ public class DroneController {
      * @return ResponseEntity with the registered drone DTO and HTTP status.
      */
     @PostMapping("/register")
-    public ResponseEntity<DroneDTO> registerDrone(@Valid @RequestBody DroneDTO droneDTO) {
+    public ResponseEntity<ApiResponse<DroneDTO>> registerDrone(@Valid @RequestBody DroneDTO droneDTO) {
         Optional<DroneDTO> registeredDrone = droneService.registerDrone(droneDTO);
         return registeredDrone
-                .map(drone -> new ResponseEntity<>(drone, HttpStatus.CREATED))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.BAD_REQUEST));
+                .map(drone -> ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(drone)))
+                .orElseGet(() -> ResponseEntity.badRequest().build());
     }
 
     /**
@@ -72,13 +78,13 @@ public class DroneController {
      * @return ResponseEntity with the loaded drone DTO and HTTP status.
      */
     @PostMapping("/{serialNumber}/load")
-    public ResponseEntity<DroneDTO> loadDroneWithMedications(
+    public ResponseEntity<ApiResponse<DroneDTO>> loadDroneWithMedications(
             @PathVariable String serialNumber,
             @Valid @RequestBody Set<MedicationDTO> medications) {
         Optional<DroneDTO> loadedDrone = droneService.loadDroneWithMedications(serialNumber, medications);
         return loadedDrone
-                .map(drone -> new ResponseEntity<>(drone, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.BAD_REQUEST));
+                .map(drone -> ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(drone)))
+                .orElseGet(() -> ResponseEntity.badRequest().build());
     }
 
     /**
@@ -87,9 +93,9 @@ public class DroneController {
      * @return ResponseEntity with the list of available drone DTOs and HTTP status.
      */
     @GetMapping("/available")
-    public ResponseEntity<List<DroneDTO>> getAvailableDronesForLoading() {
+    public ResponseEntity<ApiResponse<List<DroneDTO>>> getAvailableDronesForLoading() {
         List<DroneDTO> availableDrones = droneService.getAvailableDronesForLoading();
-        return new ResponseEntity<>(availableDrones, HttpStatus.OK);
+        return ResponseEntity.ok(ApiResponse.success(availableDrones));
     }
 
     /**
@@ -99,9 +105,9 @@ public class DroneController {
      * @return ResponseEntity with the battery level and HTTP status.
      */
     @GetMapping("/{serialNumber}/battery")
-    public ResponseEntity<Integer> getDroneBatteryLevel(@PathVariable String serialNumber) {
+    public ResponseEntity<ApiResponse<Integer>> getDroneBatteryLevel(@PathVariable String serialNumber) {
         int batteryLevel = droneService.checkDroneBatteryLevel(serialNumber);
-        return new ResponseEntity<>(batteryLevel, HttpStatus.OK);
+        return ResponseEntity.ok(ApiResponse.success(batteryLevel));
     }
 
     /**
@@ -110,9 +116,9 @@ public class DroneController {
      * @return ResponseEntity with the list of audit log events and HTTP status.
      */
     @GetMapping("/events")
-    public ResponseEntity<List<AuditLog>> getAuditLogEvents() {
+    public ResponseEntity<ApiResponse<List<AuditLog>>> getAuditLogEvents() {
         List<AuditLog> auditLogEvents = droneService.getAuditLogEvents();
-        return new ResponseEntity<>(auditLogEvents, HttpStatus.OK);
+        return ResponseEntity.ok(ApiResponse.success(auditLogEvents));
     }
 
     /**
@@ -123,13 +129,13 @@ public class DroneController {
      * @return ResponseEntity with the changed drone DTO and HTTP status.
      */
     @PostMapping("/{serialNumber}/change-state/{newState}")
-    public ResponseEntity<DroneDTO> changeDroneState(
+    public ResponseEntity<ApiResponse<DroneDTO>> changeDroneState(
             @PathVariable String serialNumber,
             @PathVariable DroneState newState) {
         Optional<DroneDTO> changedDrone = droneService.changeDroneState(serialNumber, newState);
         return changedDrone
-                .map(drone -> new ResponseEntity<>(drone, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+                .map(drone -> ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(drone)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     /**
@@ -140,17 +146,17 @@ public class DroneController {
      * @return ResponseEntity with the changed drone DTO and HTTP status.
      */
     @PostMapping("/{serialNumber}/change-battery-capacity/{newBatteryCapacity}")
-    public ResponseEntity<DroneDTO> changeBatteryCapacity(
+    public ResponseEntity<ApiResponse<DroneDTO>> changeBatteryCapacity(
             @PathVariable String serialNumber,
             @PathVariable int newBatteryCapacity
     ) {
         if (newBatteryCapacity < 0 || newBatteryCapacity > 100) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return ResponseEntity.badRequest().build();
         }
         Optional<DroneDTO> changedDrone = droneService.changeBatteryCapacity(serialNumber, newBatteryCapacity);
         return changedDrone
-                .map(drone -> new ResponseEntity<>(drone, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+                .map(drone -> ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(drone)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
 }
