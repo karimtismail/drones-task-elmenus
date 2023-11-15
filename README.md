@@ -112,14 +112,17 @@ mvn javadoc:javadoc
 
 ## Development
 
-### Database
-Change username and password in application.properties file in resources package
+### Database Configuration
+By default, the application uses an H2 database. If you want to use MySQL, follow these steps:
 
+1. Open the `application.properties` file located in the `resources` package.
+
+2. Update the `spring.datasource.username` and `spring.datasource.password` properties with your MySQL username and password.
+```properties
+spring.datasource.url=jdbc:mysql://localhost:3306/your_database_name
+spring.datasource.username=your_mysql_username
+spring.datasource.password=your_mysql_password
 ```
-spring.datasource.username=yourUsername
-spring.datasource.password=yourPassword
-```
-...
 
 ### Swagger API Documentation
 The Swagger API documentation for this project is accessible at [Swagger API Documentation](http://localhost:8080/swagger-ui/index.html#/). Please refer to this documentation for information on available API endpoints and how to interact with them.
