@@ -90,7 +90,7 @@ While implementing your solution **please take care of the following requirement
 Clone the repository:
 
 ```bash
-[git clone https://github.com/your-username/drones.git](https://github.com/karimtismail/drones-task-elmenus.git)
+https://github.com/karimtismail/drones-task-elmenus.git
 ```
 
 ### Build the project
