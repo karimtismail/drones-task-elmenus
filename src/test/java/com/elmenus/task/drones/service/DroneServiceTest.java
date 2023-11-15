@@ -20,8 +20,8 @@ import org.modelmapper.ModelMapper;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -33,10 +33,10 @@ public class DroneServiceTest {
     private DroneRepository droneRepository;
 
     @Mock
-    private AuditLogRepository auditLogRepository;
+    private ModelMapper mapper;
 
     @Mock
-    private ModelMapper mapper;
+    private AuditLogRepository auditLogRepository;
 
     @InjectMocks
     private DroneService droneService;
@@ -47,6 +47,8 @@ public class DroneServiceTest {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
+        droneRepository = mock(DroneRepository.class);
+        droneService = new DroneService(droneRepository, auditLogRepository, mapper);
     }
 
     /**
@@ -61,7 +63,7 @@ public class DroneServiceTest {
          */
         @Test
         @DisplayName("Should throw WeightExceededException when weight limit is exceeded")
-        public void shouldThrowWeightExceededExceptionWhenWeightLimitIsExceeded() {
+        public void loadDroneWithMedications_WeightLimitExceeded_ThrowsWeightExceededException() {
             // Arrange
             String serialNumber = "123";
             Set<MedicationDTO> medications = new HashSet<>();
@@ -93,7 +95,7 @@ public class DroneServiceTest {
          */
         @Test
         @DisplayName("Should throw DroneStateException when drone is not in the LOADING state")
-        public void shouldDroneStateExceptionWhenDroneNotInLoadingState() {
+        public void loadDroneWithMedications_DroneNotInLoadingState_ThrowsDroneStateException() {
             // Arrange
             String serialNumber = "123";
             Set<MedicationDTO> medications = new HashSet<>();
@@ -119,7 +121,7 @@ public class DroneServiceTest {
          */
         @Test
         @DisplayName("Should throw DroneNotFoundException when drone with given serial number does not exist")
-        public void shouldThrowDroneNotFoundExceptionWhenDroneNotFound() {
+        public void loadDroneWithMedications_DroneNotFound_ThrowsDroneNotFoundException() {
             // Arrange
             String serialNumber = "123";
             Set<MedicationDTO> medications = new HashSet<>();

@@ -31,6 +31,7 @@ public class DroneService {
      * Constant for the minimum battery capacity required for loading medications.
      */
     public static final int MIN_BATTERY_CAPACITY_FOR_LOADING = 25;
+
     /**
      * Constant for the maximum battery capacity required for loading medications.
      */
@@ -248,6 +249,9 @@ public class DroneService {
         Drone drone = droneRepository.findBySerialNumber(serialNumber);
         if (drone == null) {
             throw new DroneNotFoundException("Drone not found with serial number: " + serialNumber);
+        }
+        if (newBatteryCapacity < 0) {
+            throw new IllegalArgumentException("Battery capacity cannot be negative");
         }
         if (newBatteryCapacity > MAX_BATTERY_CAPACITY_FOR_LOADING) {
             throw new BatteryHighException("Cannot change battery capacity because it exceeds 100 percent");

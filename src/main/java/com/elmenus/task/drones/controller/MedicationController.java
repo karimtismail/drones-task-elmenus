@@ -2,8 +2,8 @@ package com.elmenus.task.drones.controller;
 
 import com.elmenus.task.drones.dto.MedicationDTO;
 import com.elmenus.task.drones.service.MedicationService;
+import com.elmenus.task.drones.utility.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,8 +40,8 @@ public class MedicationController {
      * @return ResponseEntity with the list of loaded medication DTOs and HTTP status.
      */
     @GetMapping("/loaded/{serialNumber}")
-    public ResponseEntity<List<MedicationDTO>> getLoadedMedicationsForDrone(@PathVariable String serialNumber) {
+    public ResponseEntity<ApiResponse<List<MedicationDTO>>> getLoadedMedicationsForDrone(@PathVariable String serialNumber) {
         List<MedicationDTO> loadedMedications = medicationService.getLoadedMedicationsForDrone(serialNumber);
-        return new ResponseEntity<>(loadedMedications, HttpStatus.OK);
+        return ResponseEntity.ok(ApiResponse.success(loadedMedications));
     }
 }
