@@ -1,4 +1,4 @@
-package com.elmenus.task.drones.enums;
+package com.elmenus.task.drones.shared.enums;
 
 /**
  * Enum representing different models of drones based on their weight classes.

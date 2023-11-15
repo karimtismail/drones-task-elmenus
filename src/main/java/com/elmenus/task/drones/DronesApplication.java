@@ -3,6 +3,7 @@ package com.elmenus.task.drones;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 /**
  * The main application class for managing drones.
@@ -16,6 +17,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  */
 @SpringBootApplication
 @EnableScheduling
+@EnableWebMvc
 public class DronesApplication {
 
     /**

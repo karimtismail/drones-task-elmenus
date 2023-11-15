@@ -3,10 +3,9 @@ package com.elmenus.task.drones.controller;
 import com.elmenus.task.drones.dto.DroneDTO;
 import com.elmenus.task.drones.dto.MedicationDTO;
 import com.elmenus.task.drones.entity.AuditLog;
-import com.elmenus.task.drones.enums.DroneState;
-import com.elmenus.task.drones.exception.*;
 import com.elmenus.task.drones.service.DroneService;
-import com.elmenus.task.drones.utility.ApiResponse;
+import com.elmenus.task.drones.shared.enums.DroneState;
+import com.elmenus.task.drones.shared.utility.ApiResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -39,24 +38,6 @@ public class DroneController {
     }
 
     /**
-     * Exception handler for BatteryLowException, BatteryHighException, BatteryEqualException, WeightExceededException, DroneStateException, and DroneNotFoundException.
-     *
-     * @param e The exception to be handled.
-     * @return ResponseEntity with an error message and HTTP status.
-     */
-    @ExceptionHandler({
-            BatteryLowException.class,
-            BatteryHighException.class,
-            BatteryEqualException.class,
-            WeightExceededException.class,
-            DroneStateException.class,
-            DroneNotFoundException.class})
-    public ResponseEntity<ApiResponse<Void>> handleCustomExceptions(RuntimeException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ApiResponse.error(e.getMessage(), HttpStatus.BAD_REQUEST));
-    }
-
-    /**
      * Endpoint for registering a new drone.
      *
      * @param droneDTO The DTO representing the drone to be registered.
@@ -67,7 +48,7 @@ public class DroneController {
         Optional<DroneDTO> registeredDrone = droneService.registerDrone(droneDTO);
         return registeredDrone
                 .map(drone -> ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(drone)))
-                .orElseGet(() -> ResponseEntity.badRequest().build());
+                .orElse(ResponseEntity.badRequest().build());
     }
 
     /**
@@ -84,7 +65,7 @@ public class DroneController {
         Optional<DroneDTO> loadedDrone = droneService.loadDroneWithMedications(serialNumber, medications);
         return loadedDrone
                 .map(drone -> ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(drone)))
-                .orElseGet(() -> ResponseEntity.badRequest().build());
+                .orElse(ResponseEntity.badRequest().build());
     }
 
     /**
@@ -135,7 +116,7 @@ public class DroneController {
         Optional<DroneDTO> changedDrone = droneService.changeDroneState(serialNumber, newState);
         return changedDrone
                 .map(drone -> ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(drone)))
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .orElse(ResponseEntity.notFound().build());
     }
 
     /**
@@ -156,7 +137,7 @@ public class DroneController {
         Optional<DroneDTO> changedDrone = droneService.changeBatteryCapacity(serialNumber, newBatteryCapacity);
         return changedDrone
                 .map(drone -> ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(drone)))
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .orElse(ResponseEntity.notFound().build());
     }
 
 }

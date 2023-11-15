@@ -1,4 +1,4 @@
-package com.elmenus.task.drones.enums;
+package com.elmenus.task.drones.shared.enums;
 
 /**
  * Enum representing different states of drones based on their state classes.

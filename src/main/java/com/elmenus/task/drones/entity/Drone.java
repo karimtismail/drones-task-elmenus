@@ -1,7 +1,7 @@
 package com.elmenus.task.drones.entity;
 
-import com.elmenus.task.drones.enums.DroneModel;
-import com.elmenus.task.drones.enums.DroneState;
+import com.elmenus.task.drones.shared.enums.DroneModel;
+import com.elmenus.task.drones.shared.enums.DroneState;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

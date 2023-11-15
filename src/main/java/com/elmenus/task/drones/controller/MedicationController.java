@@ -2,7 +2,7 @@ package com.elmenus.task.drones.controller;
 
 import com.elmenus.task.drones.dto.MedicationDTO;
 import com.elmenus.task.drones.service.MedicationService;
-import com.elmenus.task.drones.utility.ApiResponse;
+import com.elmenus.task.drones.shared.utility.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;

@@ -1,4 +1,4 @@
-package com.elmenus.task.drones.utility;
+package com.elmenus.task.drones.shared.utility;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

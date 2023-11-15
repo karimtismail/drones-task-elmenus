@@ -1,7 +1,7 @@
 package com.elmenus.task.drones.repository;
 
 import com.elmenus.task.drones.entity.Drone;
-import com.elmenus.task.drones.enums.DroneState;
+import com.elmenus.task.drones.shared.enums.DroneState;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

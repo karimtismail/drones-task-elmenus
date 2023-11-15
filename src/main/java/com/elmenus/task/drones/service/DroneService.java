@@ -6,7 +6,7 @@ import com.elmenus.task.drones.entity.AuditLog;
 import com.elmenus.task.drones.entity.Drone;
 import com.elmenus.task.drones.entity.DroneMedication;
 import com.elmenus.task.drones.entity.Medication;
-import com.elmenus.task.drones.enums.DroneState;
+import com.elmenus.task.drones.shared.enums.DroneState;
 import com.elmenus.task.drones.exception.*;
 import com.elmenus.task.drones.repository.AuditLogRepository;
 import com.elmenus.task.drones.repository.DroneRepository;
@@ -212,7 +212,7 @@ public class DroneService {
         if (drone == null) {
             throw new DroneNotFoundException("Drone not found with serial number: " + serialNumber);
         }
-        if (drone.getBatteryCapacity() < 25) {
+        if (drone.getBatteryCapacity() < MIN_BATTERY_CAPACITY_FOR_LOADING) {
             throw new BatteryLowException("Cannot change state drone when battery capacity is low");
         }
         drone.setState(newState);

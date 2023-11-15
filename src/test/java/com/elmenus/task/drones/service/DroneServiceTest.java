@@ -2,7 +2,7 @@ package com.elmenus.task.drones.service;
 
 import com.elmenus.task.drones.dto.MedicationDTO;
 import com.elmenus.task.drones.entity.Drone;
-import com.elmenus.task.drones.enums.DroneState;
+import com.elmenus.task.drones.shared.enums.DroneState;
 import com.elmenus.task.drones.exception.DroneNotFoundException;
 import com.elmenus.task.drones.exception.DroneStateException;
 import com.elmenus.task.drones.exception.WeightExceededException;

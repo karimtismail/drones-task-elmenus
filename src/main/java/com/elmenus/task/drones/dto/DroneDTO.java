@@ -1,7 +1,6 @@
 package com.elmenus.task.drones.dto;
 
-
-import com.elmenus.task.drones.enums.DroneModel;
+import com.elmenus.task.drones.shared.enums.DroneModel;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,9 +23,9 @@ public class DroneDTO implements Serializable {
     /**
      * Serial number of the drone. Must be unique and adhere to specific formatting rules.
      */
-    @Size(max = 100, message = "Serial number must be at most 100 characters")
     @NotBlank(message = "Serial number is required")
     @NotEmpty(message = "Serial number cannot be empty")
+    @Size(max = 100, message = "Serial number must be at most 100 characters")
     @Pattern(regexp = "^[A-Z0-9_]*$", message = "Serial number must contain only upper case letters, numbers, and '_'")
     private String serialNumber;
 
@@ -39,7 +38,7 @@ public class DroneDTO implements Serializable {
     /**
      * Weight limit of the drone. Must be a non-negative value and not exceed 500 grams.
      */
-    @NotEmpty(message = "Weight limit cannot be empty")
+    @NotNull(message = "Weight limit is required")
     @PositiveOrZero(message = "Weight limit must be a positive or zero value")
     @Max(value = 500, message = "Weight limit cannot exceed 500 grams")
     private Integer weightLimit;
