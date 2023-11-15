@@ -6,10 +6,10 @@ import com.elmenus.task.drones.entity.AuditLog;
 import com.elmenus.task.drones.entity.Drone;
 import com.elmenus.task.drones.entity.DroneMedication;
 import com.elmenus.task.drones.entity.Medication;
-import com.elmenus.task.drones.shared.enums.DroneState;
 import com.elmenus.task.drones.exception.*;
 import com.elmenus.task.drones.repository.AuditLogRepository;
 import com.elmenus.task.drones.repository.DroneRepository;
+import com.elmenus.task.drones.shared.enums.DroneState;
 import org.modelmapper.ModelMapper;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -23,6 +23,8 @@ import java.util.stream.Collectors;
 
 /**
  * Service class for managing drones, including registration, loading medications, state changes, and battery level checks.
+ *
+ * This service provides functionality to interact with drones, manage their states, and perform various operations.
  */
 @Service
 public class DroneService {
@@ -245,6 +247,17 @@ public class DroneService {
         return auditLogRepository.findAll();
     }
 
+    /**
+     * Changes the battery capacity of a drone.
+     *
+     * @param serialNumber       The serial number of the drone.
+     * @param newBatteryCapacity The new battery capacity to set.
+     * @return An optional {@link DroneDTO} containing the updated drone as a DTO.
+     * @throws DroneNotFoundException   If the drone is not found with the given serial number.
+     * @throws IllegalArgumentException If the new battery capacity is negative.
+     * @throws BatteryHighException     If the new battery capacity exceeds the maximum allowed.
+     * @throws BatteryEqualException    If the new battery capacity is the same as the current capacity.
+     */
     public Optional<DroneDTO> changeBatteryCapacity(String serialNumber, int newBatteryCapacity) {
         Drone drone = droneRepository.findBySerialNumber(serialNumber);
         if (drone == null) {
